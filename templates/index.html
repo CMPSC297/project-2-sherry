@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>NittanyReads</title>
+{% endblock %}
+
+{% block body %}
+<div>
+    <h1>Nittany Reads</h1>
+    <p class="welcomeText">Welcome to our book review website, where we invite you to explore the world of 
+        literature with us! Whether you're an avid reader, a casual book lover, or someone 
+        looking for your next great read, we're here to provide you with insightful and 
+        thought-provoking reviews of the latest and greatest books. Our team of passionate 
+        readers is dedicated to bringing you honest and thorough reviews that will help you 
+        decide which books to add to your reading list. We believe that reading is one of life's 
+        greatest pleasures, and we're thrilled to share our love of books with you. So sit back, 
+        grab a cup of tea or coffee, and enjoy browsing our website for your next literary adventure!</p>
+    <div>
+        <h2>Registration</h2>
+        <form action="/submit" method="POST">
+            {% if message %}
+            <p class="message" style="color:red">{{ message | safe }}</p>
+            {% endif %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password"><br><br>
+            <input type="submit" value="Submit" class="submit">
+        </form>
+        <p>Have an account?</p>
+        <p>Login</p>
+    </div>
+</div>
+
+{% endblock %}

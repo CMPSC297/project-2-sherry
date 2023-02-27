@@ -1,0 +1,19 @@
+body {
+    margin: 50px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
+}
+
+h1 {
+    font-size: 50px;
+    color: rgb(23, 29, 142);
+}
+
+.welcomeText {
+    color: rgb(4, 12, 171);
+    margin-bottom: 40px;
+}
+
+.submit {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
