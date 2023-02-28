@@ -5,9 +5,9 @@ app = Flask(__name__)
 
 # ENV = "dev"
 
-# if ENV == "def":
+# if ENV == "dev":
 #     app.debug = True
-#     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:123456@localhost/registration"
+#     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:123456@localhost/postgres"
 # else:
 #     app.debug = False
 #     app.config["SQLALCHEMY_DATABASE_URI"] = ""
