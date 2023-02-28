@@ -2,9 +2,31 @@
 
 {% block head %}
 <title>Login</title>
+
 {% endblock %}
 
 {% block body %}
-<h1>Registration</h1>
+<div>
+    <form action="/logout" method="POST">
+        <button class="logoutSignInButton">HOME</button>
+    </form>
+    <h1 style="margin-bottom: 10px;">Login</h1>
+    <p style="width: 520px;">
+        Unlock a world of possibilities and personalized experiences with just a click. 
+        Log in now to access exclusive content and features tailored just for you.
+    </p>
+    <div>
+        {% if message %}
+            <p class="message" style="color:red">{{ message | safe }}</p>
+        {% endif %}
+        <form action="/signin" method="POST">
+            <label for="loginusername">Username:</label>
+            <input type="text" id="loginusername" name="loginusername"><br><br>
+            <label for="loginpassword">Password:</label>
+            <input type="text" id="loginpassword" name="loginpassword"><br><br>
+            <button class="submit">Login</button>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

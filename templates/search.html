@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Search</title>
+
+{% endblock %}
+
+{% block body %}
+<div>
+    <form action="/logout" method="POST">
+        <button class="logoutSignInButton">LOGOUT</button>
+    </form>
+    <h1>Search</h1>
+    <p>To search for a book, please enter the book's ISBN number, title, or author.</p>
+    <form action="/search", method="POST">
+        <label for="isbn" style="font-weight: bold;">ISBN:</label>
+        <input type="text" id="isbn" name="isbn" class="isbn"><br><br>
+
+        <label for="bookTitle" style="font-weight: bold;">Title:</label>
+        <input type="text" id="bookTitle" name="bookTitle" class="bookTitle"><br><br>
+
+        <label for="author" style="font-weight: bold;">Author:</label>
+        <input type="text" id="author" name="author" class="author"><br><br>
+        <input type="submit" id="search" class="search" value="Search">
+    </form>
+    {% if message %}
+        <p class="message" style="color:red">{{ message | safe }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}
