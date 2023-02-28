@@ -38,7 +38,14 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
         # Need if statement checking if username already exists in DB
+        # check if username already exists
+        user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
+        if user:
+            return render_template("error.html", message="Username already taken, please choose a different one.")
 
+        # if username doesn't exist, add user to database
+        db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
+        db.commit()
         if username == "" or password == "":
             return render_template("index.html", message="* Please enter required fields")
         return render_template("login.html")
@@ -58,6 +65,7 @@ def login():
         if loginusername == "" or loginpassword == "":
             return render_template("login.html", message="* Please enter your username and/or password correctly")
         # Need to check if username and password both match
+        
         return render_template("search.html")
 
 # Logout
