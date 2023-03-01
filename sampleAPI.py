@@ -2,7 +2,8 @@
 
 import requests
 
-url = "https://www.googleapis.com/books/v1/volumes?"
+# url = "https://www.googleapis.com/books/v1/volumes?"
+url = "https://www.googleapis.com/books/v1/volumes?q=search+terms"
 
 # query to search using isbn
 res = requests.get(url, params={ "q": {"isbn:0374528373"} })
