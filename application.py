@@ -14,7 +14,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Set up database
-engine = create_engine("postgresql://localhost/sherryzhang")
+engine = create_engine("postgresql://localhost/dhitasrikanth")
 db = scoped_session(sessionmaker(bind=engine))
 
 app = Flask(__name__)
@@ -75,7 +75,19 @@ def search():
         author = request.form["author"]
         if isbn == "" and bookTitle == "" and author == "":
             return render_template("search.html", message="* Please enter an ISBN number, book title, or author.")
+        # Query the database for books matching the search criteria
+        search_query = f"%{isbn}%"
+        search_query_title = f"%{bookTitle}%"
+        search_query_author = f"%{author}%"
+        books = db.execute("SELECT * FROM books WHERE isbn LIKE :search_query OR title LIKE :search_query_title OR author LIKE :search_query_author",
+                            {"search_query": search_query, "search_query_title": search_query_title, "search_query_author": search_query_author}).fetchall()
 
+        # If no books are found, return an error message
+        if len(books) == 0:
+            return render_template("search.html", message="No books found matching that search criteria.")
+
+        # Otherwise, display the list of books
+        return render_template("search.html", books=books)
 
 if __name__ == "__main__":
     app.debug = True
