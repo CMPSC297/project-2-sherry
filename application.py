@@ -106,7 +106,7 @@ def review():
         
         # Insert the new review into the database
         db.execute("INSERT INTO reviews (user_id, book_id, rating, text) VALUES (:user_id, :book_id, :rating, :text)",
-                    {"user_id": user_id, "book_id": book_id, "rating": rating, "text": review_text})
+                    {"user_id": user_id, "book_id": book_id, "rating": rating, "text": text})
         db.commit()
         
         #Dont know if review page exisits already
