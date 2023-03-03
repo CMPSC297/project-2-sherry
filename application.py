@@ -33,13 +33,13 @@ def register():
         password = request.form["password"]
 
         # Username already exists in database
-        user = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
-        if user:
-            return render_template("index.html", message="Username already taken, please choose a different one.")
+        userDB = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
+        if userDB:
+            return render_template("index.html", message="* Username is already taken. Please select a different one.")
 
         # User did not provide a username and/or password
         if username == "" or password == "":
-            return render_template("index.html", message="* Please enter required fields")
+            return render_template("index.html", message="* Please enter required fields.")
         
         # Creating new account
         db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
@@ -48,7 +48,7 @@ def register():
 
         return render_template("login.html")
 
-# Login on Home Page
+# LOGIN on Home Page that routes to Login page
 @app.route("/login", methods=["POST"])
 def signin():
     if request.method == "POST":
@@ -58,13 +58,15 @@ def signin():
 @app.route("/signin", methods=["POST"])
 def login():
     if request.method == "POST":
-        loginusername = request.form["loginusername"]
-        loginpassword = request.form["loginpassword"]
-        if loginusername == "" or loginpassword == "":
-            return render_template("login.html", message="* Please enter your username and/or password correctly")
-        # Need to check if username and password both match
+        username = request.form["username"]
+        password = request.form["password"]
         
-        return render_template("search.html")
+        userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), {"username": username, "password": password}).fetchone()
+
+        if userInfo:
+            return render_template("search.html")
+        
+    return render_template("login.html", message = "* Username and/or password is incorrect")
 
 # Logout
 @app.route("/logout", methods=["POST"])
