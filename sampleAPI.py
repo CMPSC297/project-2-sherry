@@ -1,5 +1,4 @@
 #for complete guide refer to API documentation  here https://developers.google.com/books/docs/v1/using 
-
 import requests
 import json
 from urllib.request import urlopen
@@ -13,7 +12,6 @@ def retrieveBook(isbn):
         raise Exception("ERROR: API request unsuccessful.")
 
     bookData = res.json()
-
     volumeInfo = bookData["items"][0]["volumeInfo"]
     author = volumeInfo["authors"]
     editAuthor = author if len(author) > 1 else author[0]
@@ -27,7 +25,7 @@ def retrieveBook(isbn):
         rating = "Unavailable"
         reviewCount = 0
     
-    # Creating dictionary, which we will return as JSON
+    # Creating dictionary, which will return as JSON object
     bookInfo = {
         "title": volumeInfo['title'],
         "author": editAuthor,
@@ -38,7 +36,4 @@ def retrieveBook(isbn):
     }
 
     return json.dumps(bookInfo)
-
-# Test case below
-# print(retrieveBook("react"))
 

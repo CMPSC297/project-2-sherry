@@ -33,7 +33,8 @@ def register():
         password = request.form["password"]
 
         # Username already exists in database
-        userDB = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
+        userDB = db.execute(text("SELECT * FROM users WHERE username = :username"), 
+            {"username": username}).fetchone()
         if userDB:
             return render_template("index.html", message="* Username is already taken. Please select a different one.")
 
@@ -48,7 +49,7 @@ def register():
 
         return render_template("login.html")
 
-# LOGIN on Home Page that routes to Login page
+# LOGIN on Home Page that routes to Login Page
 @app.route("/login", methods=["POST"])
 def signin():
     if request.method == "POST":
@@ -61,7 +62,8 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         
-        userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), {"username": username, "password": password}).fetchone()
+        userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
+            {"username": username, "password": password}).fetchone()
 
         if userInfo:
             return render_template("search.html")
@@ -79,10 +81,42 @@ def logout():
 def search():
     if request.method == "POST":
         isbn = request.form["isbn"]
-        bookTitle= request.form["bookTitle"]
+        title= request.form["title"]
         author = request.form["author"]
-        if isbn == "" and bookTitle == "" and author == "":
+        if isbn == "" and title == "" and author == "":
             return render_template("search.html", message="* Please enter an ISBN number, book title, or author.")
+        
+        # Searching by ISBN
+        elif isbn and title == "" and author == "":
+            books = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"), 
+                {"isbn": isbn}).fetchall()
+            if books:
+                return render_template("search.html", message=books)
+            else:
+                return render_template("search.html", message="No matches.")
+        
+        # Searching by Book Title
+        elif title and isbn == "" and author == "":
+            books = db.execute(text("SELECT * FROM books WHERE title = :title"), 
+                {"title": title}).fetchall()
+            if books:
+                return render_template("search.html", message=books)
+            else:
+                return render_template("search.html", message="No matches.")
+        
+        # Searching by Author
+        elif author and isbn == "" and title == "":
+            books = db.execute(text("SELECT * FROM books WHERE author = :author"), 
+                {"author": author}).fetchall()
+            if books:
+                return render_template("search.html", message=books)
+            else:
+                return render_template("search.html", message="No matches.")
+        
+        else:
+            return render_template("search.html", message="* Please only fill out one field above")
+
+
         # Query the database for books matching the search criteria
         # search_query = f"%{isbn}%"
         # search_query_title = f"%{bookTitle}%"
@@ -93,9 +127,9 @@ def search():
         # If no books are found, return an error message
         # if len(books) == 0:
         #     return render_template("search.html", message="No books found matching that search criteria.")
-        if isbn and not bookTitle and not author:
-            book = retrieveBook("isbn")
-        return render_template("book.html", message=book)
+        # if isbn and not bookTitle and not author:
+        #     book = retrieveBook("isbn")
+        # return render_template("book.html", message=book)
         # Otherwise, display the list of books
         # return render_template("search.html", books=books)
 

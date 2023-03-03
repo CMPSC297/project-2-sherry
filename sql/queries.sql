@@ -1,13 +1,12 @@
 CREATE TABLE BOOKS (
-    isbn INTEGER PRIMARY KEY,
+    isbn VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
     author VARCHAR NOT NULL,
-    year INTEGER NOT NULL
+    year VARCHAR NOT NULL
 );
 
 CREATE TABLE users (
-    id VARCHAR PRIMARY KEY,
-    username VARCHAR NOT NULL,
+    username VARCHAR PRIMARY KEY,
     password VARCHAR NOT NULL
 );
 
