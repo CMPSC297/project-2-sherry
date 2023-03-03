@@ -1,9 +1,11 @@
 import os
 import psycopg2
+from sampleAPI import retrieveBook
 from flask import Flask, render_template, request, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
@@ -14,7 +16,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Set up database
-engine = create_engine("postgresql://localhost/dhitasrikanth")
+engine = create_engine("postgresql://localhost/sherryzhang")
 db = scoped_session(sessionmaker(bind=engine))
 
 app = Flask(__name__)
@@ -29,17 +31,21 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        # Need if statement checking if username already exists in DB
-        # check if username already exists
-        user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
-        if user:
-            return render_template("error.html", message="Username already taken, please choose a different one.")
 
-        # if username doesn't exist, add user to database
-        db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
-        db.commit()
+        # Username already exists in database
+        user = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
+        if user:
+            return render_template("index.html", message="Username already taken, please choose a different one.")
+
+        # User did not provide a username and/or password
         if username == "" or password == "":
             return render_template("index.html", message="* Please enter required fields")
+        
+        # Creating new account
+        db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
+            {"username": username, "password": password})   
+        db.commit()
+
         return render_template("login.html")
 
 # Login on Home Page
@@ -76,18 +82,20 @@ def search():
         if isbn == "" and bookTitle == "" and author == "":
             return render_template("search.html", message="* Please enter an ISBN number, book title, or author.")
         # Query the database for books matching the search criteria
-        search_query = f"%{isbn}%"
-        search_query_title = f"%{bookTitle}%"
-        search_query_author = f"%{author}%"
-        books = db.execute("SELECT * FROM books WHERE isbn LIKE :search_query OR title LIKE :search_query_title OR author LIKE :search_query_author",
-                            {"search_query": search_query, "search_query_title": search_query_title, "search_query_author": search_query_author}).fetchall()
+        # search_query = f"%{isbn}%"
+        # search_query_title = f"%{bookTitle}%"
+        # search_query_author = f"%{author}%"
+        # books = db.execute("SELECT * FROM books WHERE isbn LIKE :search_query OR title LIKE :search_query_title OR author LIKE :search_query_author",
+        #                     {"search_query": search_query, "search_query_title": search_query_title, "search_query_author": search_query_author}).fetchall()
 
         # If no books are found, return an error message
-        if len(books) == 0:
-            return render_template("search.html", message="No books found matching that search criteria.")
-
+        # if len(books) == 0:
+        #     return render_template("search.html", message="No books found matching that search criteria.")
+        if isbn and not bookTitle and not author:
+            book = retrieveBook("isbn")
+        return render_template("book.html", message=book)
         # Otherwise, display the list of books
-        return render_template("search.html", books=books)
+        # return render_template("search.html", books=books)
 
 # Writing Review
 @app.route("/review", methods=["POST"])
