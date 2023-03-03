@@ -89,6 +89,28 @@ def search():
         # Otherwise, display the list of books
         return render_template("search.html", books=books)
 
+# Writing Review
+@app.route("/review", methods=["POST"])
+def review():
+    if request.method == "POST":
+        user_id = session["user_id"]
+        book_id = request.form["book_id"]
+        rating = request.form["rating"]
+        text = request.form["text"]
+        
+        # Check if the user has already submitted a review for this book
+        existing_review = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", 
+                                     {"user_id": user_id, "book_id": book_id}).fetchone()
+        if existing_review:
+            return render_template("error.html", message="You have already submitted a review for this book.")
+        
+        # Insert the new review into the database
+        db.execute("INSERT INTO reviews (user_id, book_id, rating, text) VALUES (:user_id, :book_id, :rating, :text)",
+                    {"user_id": user_id, "book_id": book_id, "rating": rating, "text": text})
+        db.commit()
+        
+        #Dont know if review page exisits already
+
 if __name__ == "__main__":
     app.debug = True
     app.run(host="0.0.0.0", port=8080)

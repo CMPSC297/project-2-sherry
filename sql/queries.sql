@@ -5,8 +5,9 @@ CREATE TABLE BOOKS (
     year INTEGER NOT NULL
 );
 
-CREATE TABLE info (
-    username VARCHAR PRIMARY KEY,
+CREATE TABLE users (
+    id VARCHAR PRIMARY KEY,
+    username VARCHAR NOT NULL,
     password VARCHAR NOT NULL
 );
 
