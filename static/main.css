@@ -67,4 +67,21 @@ h1 {
     margin-left: 0px;
 }
 
+/* Search Result Page */
+
+.form-control {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Book Page*/
+.review {
+    width: 200px;
+}
+
+
 

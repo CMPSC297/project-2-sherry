@@ -32,15 +32,15 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
+        # User did not provide a username and/or password
+        if username == "" or password == "":
+            return render_template("index.html", message="* Please enter required fields.")
+        
         # Username already exists in database
         userDB = db.execute(text("SELECT * FROM users WHERE username = :username"), 
             {"username": username}).fetchone()
         if userDB:
             return render_template("index.html", message="* Username is already taken. Please select a different one.")
-
-        # User did not provide a username and/or password
-        if username == "" or password == "":
-            return render_template("index.html", message="* Please enter required fields.")
         
         # Creating new account
         db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
@@ -90,8 +90,8 @@ def search():
         elif isbn and title == "" and author == "":
             books = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"), 
                 {"isbn": isbn}).fetchall()
-            if books:
-                return render_template("search.html", message=books)
+            if books: 
+                return render_template("searchResult.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
@@ -99,8 +99,8 @@ def search():
         elif title and isbn == "" and author == "":
             books = db.execute(text("SELECT * FROM books WHERE title = :title"), 
                 {"title": title}).fetchall()
-            if books:
-                return render_template("search.html", message=books)
+            if books: 
+                return render_template("searchResult.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
@@ -108,52 +108,55 @@ def search():
         elif author and isbn == "" and title == "":
             books = db.execute(text("SELECT * FROM books WHERE author = :author"), 
                 {"author": author}).fetchall()
-            if books:
-                return render_template("search.html", message=books)
+            if books: 
+                return render_template("searchResult.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
         else:
             return render_template("search.html", message="* Please only fill out one field above")
 
-
-        # Query the database for books matching the search criteria
-        # search_query = f"%{isbn}%"
-        # search_query_title = f"%{bookTitle}%"
-        # search_query_author = f"%{author}%"
-        # books = db.execute("SELECT * FROM books WHERE isbn LIKE :search_query OR title LIKE :search_query_title OR author LIKE :search_query_author",
-        #                     {"search_query": search_query, "search_query_title": search_query_title, "search_query_author": search_query_author}).fetchall()
-
-        # If no books are found, return an error message
-        # if len(books) == 0:
-        #     return render_template("search.html", message="No books found matching that search criteria.")
-        # if isbn and not bookTitle and not author:
-        #     book = retrieveBook("isbn")
-        # return render_template("book.html", message=book)
-        # Otherwise, display the list of books
-        # return render_template("search.html", books=books)
-
-# Writing Review
-@app.route("/review", methods=["POST"])
-def review():
+# View Book Button
+@app.route("/view", methods=["POST"])
+def view():
     if request.method == "POST":
-        user_id = session["user_id"]
-        book_id = request.form["book_id"]
-        rating = request.form["rating"]
-        text = request.form["text"]
+        book = request.form["book"] # Gives ISBN
+        bookDetails = retrieveBook(book)        
+        return render_template("book.html", message=bookDetails)
+
+# @app.route("/review", methods=["POST"])
+# def review():
+#     if request.method == "POST":
+#         isbn = request.form["isbn"]
+#         review = request.form["review"]
+#         db.execute(text("INSERT INTO reviews (isbn, review) VALUES (:isbn, :review)"),
+#             {"isbn": isbn, "review": review}) 
+#         db.commit()
+#         return render_template("index.html")
+
+
+
+# # Writing Review
+# @app.route("/review", methods=["POST"])
+# def review():
+#     if request.method == "POST":
+#         user_id = session["user_id"]
+#         book_id = request.form["book_id"]
+#         rating = request.form["rating"]
+#         text = request.form["text"]
         
-        # Check if the user has already submitted a review for this book
-        existing_review = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", 
-                                     {"user_id": user_id, "book_id": book_id}).fetchone()
-        if existing_review:
-            return render_template("error.html", message="You have already submitted a review for this book.")
+#         # Check if the user has already submitted a review for this book
+#         existing_review = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", 
+#                                      {"user_id": user_id, "book_id": book_id}).fetchone()
+#         if existing_review:
+#             return render_template("error.html", message="You have already submitted a review for this book.")
         
-        # Insert the new review into the database
-        db.execute("INSERT INTO reviews (user_id, book_id, rating, text) VALUES (:user_id, :book_id, :rating, :text)",
-                    {"user_id": user_id, "book_id": book_id, "rating": rating, "text": text})
-        db.commit()
+#         # Insert the new review into the database
+#         db.execute("INSERT INTO reviews (user_id, book_id, rating, text) VALUES (:user_id, :book_id, :rating, :text)",
+#                     {"user_id": user_id, "book_id": book_id, "rating": rating, "text": text})
+#         db.commit()
         
-        #Dont know if review page exisits already
+#         #Dont know if review page exisits already
 
 if __name__ == "__main__":
     app.debug = True

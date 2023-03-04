@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>Book Page</title>
-
+{% block title %}
+<title>Book</title>
 {% endblock %}
 
 {% block body %}
-<div>
-    <h1>Book Page</h1>
-</div>
-
+<h1>Book</h1>
+{% if message %}
+    <p class="message" style="color:rgb(226, 223, 223);">{{ message | safe }}</p>
+{% endif %}
+<p>Read this book? Leave a review below!</p>
+<form action="/review", method="POST">
+    <p name="isbn">ISBN</p>
+    <textarea id="review" name="review" rows="10" cols="75"></textarea>
+    <input type="submit" id="search" class="search" value="Submit Review">
+</form>
 {% endblock %}
