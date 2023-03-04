@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from sampleAPI import retrieveBook
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, jsonify
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
@@ -91,7 +91,7 @@ def search():
             books = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"), 
                 {"isbn": isbn}).fetchall()
             if books: 
-                return render_template("searchResult.html", books=books)
+                return render_template("search.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
@@ -100,7 +100,7 @@ def search():
             books = db.execute(text("SELECT * FROM books WHERE title = :title"), 
                 {"title": title}).fetchall()
             if books: 
-                return render_template("searchResult.html", books=books)
+                return render_template("search.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
@@ -109,7 +109,7 @@ def search():
             books = db.execute(text("SELECT * FROM books WHERE author = :author"), 
                 {"author": author}).fetchall()
             if books: 
-                return render_template("searchResult.html", books=books)
+                return render_template("search.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
         
@@ -120,21 +120,19 @@ def search():
 @app.route("/view", methods=["POST"])
 def view():
     if request.method == "POST":
-        book = request.form["book"] # Gives ISBN
-        bookDetails = retrieveBook(book)        
-        return render_template("book.html", message=bookDetails)
+        isbn = request.form["book"] # Gives ISBN
+        bookDetailDB = retrieveBook(isbn)     
+        return render_template("book.html", message=bookDetailDB)
 
 # @app.route("/review", methods=["POST"])
 # def review():
 #     if request.method == "POST":
-#         isbn = request.form["isbn"]
+#         isbn = request.form["reviewISBN"]
 #         review = request.form["review"]
 #         db.execute(text("INSERT INTO reviews (isbn, review) VALUES (:isbn, :review)"),
 #             {"isbn": isbn, "review": review}) 
 #         db.commit()
 #         return render_template("index.html")
-
-
 
 # # Writing Review
 # @app.route("/review", methods=["POST"])

@@ -28,6 +28,22 @@
         <p class="message" style="color:red;">{{ message | safe }}</p>
     {% endif %}
 
+    <form action="/view" method="POST">
+        <div class="form-group">
+            <select class="form-control" name="book">
+                {% for books in books %}
+                    <option value ="{{ books.isbn }}">{{ books.title}} ({{ books.year }}) by {{ books.author}}</option><br></br>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <button class="submit">View Book</button>
+        </div>
+        {% if results %}
+            <p class="message" style="color:red;">{{ results | safe}}</p>
+        {% endif %}
+    </form>
+
 </div>
 
 {% endblock %}

@@ -2,6 +2,7 @@
 import requests
 import json
 from urllib.request import urlopen
+from flask import jsonify
 
 def retrieveBook(isbn):
     url = "https://www.googleapis.com/books/v1/volumes?"
@@ -12,10 +13,10 @@ def retrieveBook(isbn):
         raise Exception("ERROR: API request unsuccessful.")
 
     bookData = res.json()
+
     volumeInfo = bookData["items"][0]["volumeInfo"]
     author = volumeInfo["authors"]
     editAuthor = author if len(author) > 1 else author[0]
-    identifier = (volumeInfo["industryIdentifiers"][1]).get("identifier")
 
     # Checking if there are existing ratings
     try: 
@@ -30,10 +31,13 @@ def retrieveBook(isbn):
         "title": volumeInfo['title'],
         "author": editAuthor,
         "year": volumeInfo['publishedDate'][0:4],
-        "isbn": identifier,
+        "isbn": isbn,
         "review_count": reviewCount,
         "average_score": rating
     }
 
     return json.dumps(bookInfo)
+
+if __name__ == "__retrieveBook__":
+    retrieveBook()
 

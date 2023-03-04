@@ -11,8 +11,16 @@
 {% endif %}
 <p>Read this book? Leave a review below!</p>
 <form action="/review", method="POST">
-    <p name="isbn">ISBN</p>
-    <textarea id="review" name="review" rows="10" cols="75"></textarea>
+    <label for="rating" style="margin-right: 10px;">Rating:</label>
+    <select id="rating" name="rating">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select><br></br>
+    <label for="review">Review: </label><br></br>
+    <textarea id="review" name="review" rows="10" cols="75"></textarea><br></br>
     <input type="submit" id="search" class="search" value="Submit Review">
 </form>
 {% endblock %}

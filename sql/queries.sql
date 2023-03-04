@@ -6,12 +6,15 @@ CREATE TABLE BOOKS (
 );
 
 CREATE TABLE users (
-    username VARCHAR PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    username VARCHAR UNIQUE,
     password VARCHAR NOT NULL
 );
 
 CREATE TABLE reviews (
+    user VARCHAR,
     isbn VARCHAR,
+    rating INTEGER NOT NULL,
     review VARCHAR UNIQUE
 );
 
