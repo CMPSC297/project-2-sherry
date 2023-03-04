@@ -2,13 +2,14 @@
 
 {% block title %}
 <title>Book</title>
+
 {% endblock %}
 
 {% block body %}
 <form action="/logout" method="POST">
     <button class="logoutSignInButton">LOGOUT</button>
 </form>
-<form action="/returnToSearch">
+<form action="/returnToSearch" method="POST">
     <button class="returnToSearch">Return to Search</button>
 </form>
 <h1>Book</h1>
@@ -30,7 +31,9 @@
 {% if numberOfRating %}
     <p class="numberOfRating" style="color:rgb(226, 223, 223);">{{ numberOfRating | safe }}</p>
 {% endif %}
-<p>Read this book? Leave a review below!</p>
+
+
+<p style="text-decoration: underline;">Read this book? Leave a review below!</p>
 <form action="/review", method="POST">
     <label for="rating" style="margin-right: 10px;">Rating:</label>
     <select id="rating" name="rating">
@@ -41,14 +44,14 @@
         <option value="5">5</option>
     </select><br></br>
     <label for="review">Review: </label><br></br>
+    <input type="text" id = "isbn" name="isbn" value ="{{ isbn | safe }}" hidden="True">
     <textarea id="review" name="review" rows="10" cols="75"></textarea><br></br>
     <input type="submit" id="search" class="search" value="Submit Review">
 </form>
-{% if error %}
-    <p class="error" style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
-{% endif %}
 <p>Reviews from others: </p>
 {% if reviews %}
-    <p class="reviews" style="color:rgb(226, 223, 223);">{{ reviews | safe }}</p>
+    {% for review in reviews %}
+        <p>{{ review }}</p>
+    {% endfor %}
 {% endif %}
 {% endblock %}

@@ -8,8 +8,14 @@
 {% block body %}
 
 {% if error %}
-    <h1>Error</h1>
-    <p class="error" style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
+<form action="/logout" method="POST">
+    <button class="logoutSignInButton">LOGOUT</button>
+</form>
+<form action="/returnToSearch" method="POST">
+    <button class="returnToSearch">Return to Search</button>
+</form>
+<h1>Error</h1>
+<p class="error" style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
 {% endif %}
 
 {% endblock %}

@@ -13,10 +13,10 @@ CREATE TABLE users (
 
 CREATE TABLE reviews (
     reviewID SERIAL PRIMARY KEY,
-    username VARCHAR,
-    isbn VARCHAR,
+    id INT NOT NULL,
+    isbn VARCHAR NOT NULL,
     rating INTEGER NOT NULL,
-    review VARCHAR UNIQUE,
-    FOREIGN KEY (username) REFERENCES users(username),
+    review VARCHAR,
+    FOREIGN KEY (id) REFERENCES users(id),
     FOREIGN KEY (isbn) REFERENCES books(isbn)
 );

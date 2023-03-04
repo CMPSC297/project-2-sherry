@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from sampleAPI import retrieveBook
+from sampleAPI import retrieveBook, retrieveAverageRating, retrieveNumberOfRating
 from flask import Flask, render_template, request, session, jsonify
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
@@ -10,10 +10,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
 app.secret_key = '_23hd9udhf*HUHDF'
-# app.config['SECRET_KEY'] = 'hfouuwu9e8r9ui23jrojrlefl'
 # Configure session to use filesystem
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 # app.config['SECRET_KEY'] = 'hfouuwu9e8r9ui23jrojrlefl'
 # Session(app)
 
@@ -21,7 +20,13 @@ app.secret_key = '_23hd9udhf*HUHDF'
 engine = create_engine("postgresql://localhost/sherryzhang")
 db = scoped_session(sessionmaker(bind=engine))
 
-# app = Flask(__name__)
+@app.route('/set_session')
+def set_session(id):
+    session['id'] = id
+
+@app.route("/get_session")
+def get_session():
+    return session.get('id')
 
 @app.route("/")
 def index():
@@ -62,14 +67,15 @@ def signin():
 def login():
     if request.method == "POST":
         username = request.form["username"]
-        session['sessionUsername'] = username
+        # session['sessionUsername'] = username
         password = request.form["password"]
         
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
             {"username": username, "password": password}).fetchone()
         
-        # id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()
-        # session['userSessionID'] = id
+        id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()[0]
+        print(id)
+        set_session(id)
 
         if userInfo:
             return render_template("search.html")
@@ -80,7 +86,7 @@ def login():
 @app.route("/logout", methods=["POST"])
 def logout():
     if request.method == "POST":
-        session.pop("sessionUsername", None)
+        session.pop("id", None)
         return render_template("index.html")
 
 # Search Button
@@ -134,42 +140,64 @@ def returntoSearch():
 def view():
     if request.method == "POST":
         isbn = request.form["book"] # Gives ISBN
-        session["isbn"] = isbn
         title = db.execute(text("SELECT title FROM books WHERE isbn = :isbn"),
-            {"isbn": isbn}).fetchone()
+            {"isbn": isbn}).fetchone()[0]
         author = db.execute(text("SELECT author FROM books WHERE isbn = :isbn"),
-            {"isbn": isbn}).fetchone()
+            {"isbn": isbn}).fetchone()[0]
         year = db.execute(text("SELECT year FROM books WHERE isbn = :isbn"),
-            {"isbn": isbn}).fetchone()
+            {"isbn": isbn}).fetchone()[0]
         reviews = db.execute(text("SELECT review FROM reviews WHERE isbn = :isbn"),
             {"isbn": isbn}).fetchall()
-        message = f"ISBN: {isbn}, \nTitle: {title} \nAuthor: {author} \nYear: {year}"
-        # bookDetailDB = retrieveBook(isbn)     
-        return render_template("book.html", message=message, reviews=reviews)
+        averageRating = retrieveAverageRating(isbn)
+        numberOfRating = retrieveNumberOfRating(isbn)
+        titleDisplay = f"Title: {title}"
+        authorDisplay = f"Author: {author}"
+        yearDisplay = f"Year: {year}" 
+        return render_template("book.html", isbn=isbn, title=titleDisplay, author=authorDisplay, year=yearDisplay, averageRating=averageRating, numberOfRating=numberOfRating, reviews=reviews)
 
 @app.route("/review", methods=["POST"])
 def review():
     if request.method == "POST":
-        if "sessionUsername" and "isbn" in session:
-            username = session["sessionUsername"]
-            isbn = session["isbn"]       
-            review = request.form["review"]
-            rating = request.form["rating"]
+        id = get_session()
+        # print(userid)
+        isbn = request.form["isbn"]     
+        # print(isbn)  
+        review = request.form["review"]
+        rating = request.form["rating"]
 
-            # Check if user already has existing review for the book
-            existingReviewCheck = db.execute(text("SELECT review FROM reviews WHERE isbn = :isbn AND username = :username"),
-                {"isbn": isbn, "username": username})
-            if existingReviewCheck:
-                error = "Unable to submit review as you have already reviewed this book"
-                return render_template("error.html", error=error)
+        # Check if user already has existing review for the book
+        # print(rating)
+        # print(isbn)
 
-            else:
-                db.execute(text("INSERT INTO reviews (username, isbn, rating, review) VALUES (:username, :isbn, :rating, :review)"),
-                {"username": username, "isbn": isbn, "rating": rating, "review": review}) 
-                db.commit()
-                complete = "Your review has been submitted"
-                return render_template("success.html", complete=complete)
+        existingReviewCheck = db.execute(text("SELECT review FROM reviews WHERE id = :id AND isbn = :isbn"),
+            {"id": id, "isbn": isbn}).fetchone()
+        if existingReviewCheck:
+            error = "Unable to submit review as you have already reviewed this book"
+            return render_template("error.html", error=error)
 
+        else:
+
+            # db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
+            # {"username": username, "password": password})   
+            # db.commit()
+
+            db.execute(text("INSERT INTO reviews (id, isbn, rating, review) VALUES (:id, :isbn, :rating, :review)"),
+            {"id": id, "isbn": isbn, "rating": rating, "review": review}) 
+            db.commit()
+            complete = "Your review has been submitted"
+        return render_template("success.html", complete=complete)
+
+# @app.route("/api/flights/<int:flight_id>")
+@app.route("/api/<int:isbn>")
+def apiInfo(isbn):
+    check = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"),
+        {"isbn": str(isbn)}).fetchone()
+    if check:
+        info = retrieveBook(isbn)
+        return render_template("api.html", info=info)
+    else:
+        error = "404 Error"
+        return render_template("api.html", error=error)
 
 if __name__ == "__main__":
     app.debug = True
