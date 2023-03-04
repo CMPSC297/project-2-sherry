@@ -12,8 +12,23 @@
     <button class="returnToSearch">Return to Search</button>
 </form>
 <h1>Book</h1>
-{% if message %}
-    <p class="message" style="color:rgb(226, 223, 223);">{{ message | safe }}</p>
+{% if isbn %}
+    <p style="color:rgb(226, 223, 223);">{{ isbn | safe }}</p>
+{% endif %}
+{% if title %}
+    <p style="color:rgb(226, 223, 223);">{{ title | safe }}</p>
+{% endif %}
+{% if author %}
+    <p style="color:rgb(226, 223, 223);">{{ author | safe }}</p>
+{% endif %}
+{% if year %}
+    <p class="year" style="color:rgb(226, 223, 223);">{{ year | safe }}</p>
+{% endif %}
+{% if averageRating %}
+    <p class="averageRating" style="color:rgb(226, 223, 223);">{{ averageRating | safe }}</p>
+{% endif %}
+{% if numberOfRating %}
+    <p class="numberOfRating" style="color:rgb(226, 223, 223);">{{ numberOfRating | safe }}</p>
 {% endif %}
 <p>Read this book? Leave a review below!</p>
 <form action="/review", method="POST">
