@@ -12,18 +12,11 @@ CREATE TABLE users (
 );
 
 CREATE TABLE reviews (
-    user VARCHAR,
+    reviewID SERIAL PRIMARY KEY,
+    username VARCHAR,
     isbn VARCHAR,
     rating INTEGER NOT NULL,
-    review VARCHAR UNIQUE
+    review VARCHAR UNIQUE,
+    FOREIGN KEY (username) REFERENCES users(username),
+    FOREIGN KEY (isbn) REFERENCES books(isbn)
 );
-
--- CREATE TABLE reviews (
---     id SERIAL PRIMARY KEY,
---     book_isbn VARCHAR(13) REFERENCES books(isbn) ON DELETE CASCADE,
---     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
---     rating INTEGER NOT NULL,
---     text VARCHAR(1000),
---     UNIQUE (book_isbn, user_id)
--- );
-

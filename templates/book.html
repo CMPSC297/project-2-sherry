@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block body %}
+<form action="/logout" method="POST">
+    <button class="logoutSignInButton">LOGOUT</button>
+</form>
+<form action="/returnToSearch">
+    <button class="returnToSearch">Return to Search</button>
+</form>
 <h1>Book</h1>
 {% if message %}
     <p class="message" style="color:rgb(226, 223, 223);">{{ message | safe }}</p>
@@ -23,4 +29,11 @@
     <textarea id="review" name="review" rows="10" cols="75"></textarea><br></br>
     <input type="submit" id="search" class="search" value="Submit Review">
 </form>
+{% if error %}
+    <p class="error" style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
+{% endif %}
+<p>Reviews from others: </p>
+{% if reviews %}
+    <p class="reviews" style="color:rgb(226, 223, 223);">{{ reviews | safe }}</p>
+{% endif %}
 {% endblock %}

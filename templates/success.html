@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Success</title>
+
+{% endblock %}
+
+{% block body %}
+
+{% if complete %}
+    <h1>Success!</h1>
+    <p class="complete" style="color:rgb(226, 223, 223);">{{ complete | safe }}</p>
+{% endif %}
+
+{% endblock %}

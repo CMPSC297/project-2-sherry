@@ -9,17 +9,19 @@ from sqlalchemy.sql import text
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
-
+app.secret_key = '_23hd9udhf*HUHDF'
+# app.config['SECRET_KEY'] = 'hfouuwu9e8r9ui23jrojrlefl'
 # Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# app.config['SECRET_KEY'] = 'hfouuwu9e8r9ui23jrojrlefl'
+# Session(app)
 
 # Set up database
 engine = create_engine("postgresql://localhost/sherryzhang")
 db = scoped_session(sessionmaker(bind=engine))
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 @app.route("/")
 def index():
@@ -60,10 +62,14 @@ def signin():
 def login():
     if request.method == "POST":
         username = request.form["username"]
+        session['sessionUsername'] = username
         password = request.form["password"]
         
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
             {"username": username, "password": password}).fetchone()
+        
+        # id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()
+        # session['userSessionID'] = id
 
         if userInfo:
             return render_template("search.html")
@@ -74,6 +80,7 @@ def login():
 @app.route("/logout", methods=["POST"])
 def logout():
     if request.method == "POST":
+        session.pop("sessionUsername", None)
         return render_template("index.html")
 
 # Search Button
@@ -88,8 +95,8 @@ def search():
         
         # Searching by ISBN
         elif isbn and title == "" and author == "":
-            books = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"), 
-                {"isbn": isbn}).fetchall()
+            books = db.execute(text("SELECT * FROM books WHERE isbn LIKE :isbn"), 
+                {"isbn": isbn+"%"}).fetchall()
             if books: 
                 return render_template("search.html", books=books)
             else:
@@ -97,8 +104,8 @@ def search():
         
         # Searching by Book Title
         elif title and isbn == "" and author == "":
-            books = db.execute(text("SELECT * FROM books WHERE title = :title"), 
-                {"title": title}).fetchall()
+            books = db.execute(text("SELECT * FROM books WHERE title LIKE :title"), 
+                {"title": title+"%"}).fetchall()
             if books: 
                 return render_template("search.html", books=books)
             else:
@@ -106,8 +113,8 @@ def search():
         
         # Searching by Author
         elif author and isbn == "" and title == "":
-            books = db.execute(text("SELECT * FROM books WHERE author = :author"), 
-                {"author": author}).fetchall()
+            books = db.execute(text("SELECT * FROM books WHERE author LIKE :author"), 
+                {"author": author+"%"}).fetchall()
             if books: 
                 return render_template("search.html", books=books)
             else:
@@ -116,45 +123,53 @@ def search():
         else:
             return render_template("search.html", message="* Please only fill out one field above")
 
+# Return to Search
+@app.route("/returnToSearch", methods=["POST"])
+def returntoSearch():
+    if request.method == "POST":
+        return render_template("search.html")
+
 # View Book Button
 @app.route("/view", methods=["POST"])
 def view():
     if request.method == "POST":
         isbn = request.form["book"] # Gives ISBN
-        bookDetailDB = retrieveBook(isbn)     
-        return render_template("book.html", message=bookDetailDB)
+        session["isbn"] = isbn
+        title = db.execute(text("SELECT title FROM books WHERE isbn = :isbn"),
+            {"isbn": isbn}).fetchone()
+        author = db.execute(text("SELECT author FROM books WHERE isbn = :isbn"),
+            {"isbn": isbn}).fetchone()
+        year = db.execute(text("SELECT year FROM books WHERE isbn = :isbn"),
+            {"isbn": isbn}).fetchone()
+        reviews = db.execute(text("SELECT review FROM reviews WHERE isbn = :isbn"),
+            {"isbn": isbn}).fetchall()
+        message = f"ISBN: {isbn}, \nTitle: {title} \nAuthor: {author} \nYear: {year}"
+        # bookDetailDB = retrieveBook(isbn)     
+        return render_template("book.html", message=message, reviews=reviews)
 
-# @app.route("/review", methods=["POST"])
-# def review():
-#     if request.method == "POST":
-#         isbn = request.form["reviewISBN"]
-#         review = request.form["review"]
-#         db.execute(text("INSERT INTO reviews (isbn, review) VALUES (:isbn, :review)"),
-#             {"isbn": isbn, "review": review}) 
-#         db.commit()
-#         return render_template("index.html")
+@app.route("/review", methods=["POST"])
+def review():
+    if request.method == "POST":
+        if "sessionUsername" and "isbn" in session:
+            username = session["sessionUsername"]
+            isbn = session["isbn"]       
+            review = request.form["review"]
+            rating = request.form["rating"]
 
-# # Writing Review
-# @app.route("/review", methods=["POST"])
-# def review():
-#     if request.method == "POST":
-#         user_id = session["user_id"]
-#         book_id = request.form["book_id"]
-#         rating = request.form["rating"]
-#         text = request.form["text"]
-        
-#         # Check if the user has already submitted a review for this book
-#         existing_review = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", 
-#                                      {"user_id": user_id, "book_id": book_id}).fetchone()
-#         if existing_review:
-#             return render_template("error.html", message="You have already submitted a review for this book.")
-        
-#         # Insert the new review into the database
-#         db.execute("INSERT INTO reviews (user_id, book_id, rating, text) VALUES (:user_id, :book_id, :rating, :text)",
-#                     {"user_id": user_id, "book_id": book_id, "rating": rating, "text": text})
-#         db.commit()
-        
-#         #Dont know if review page exisits already
+            # Check if user already has existing review for the book
+            existingReviewCheck = db.execute(text("SELECT review FROM reviews WHERE isbn = :isbn AND username = :username"),
+                {"isbn": isbn, "username": username})
+            if existingReviewCheck:
+                error = "Unable to submit review as you have already reviewed this book"
+                return render_template("error.html", error=error)
+
+            else:
+                db.execute(text("INSERT INTO reviews (username, isbn, rating, review) VALUES (:username, :isbn, :rating, :review)"),
+                {"username": username, "isbn": isbn, "rating": rating, "review": review}) 
+                db.commit()
+                complete = "Your review has been submitted"
+                return render_template("success.html", complete=complete)
+
 
 if __name__ == "__main__":
     app.debug = True
