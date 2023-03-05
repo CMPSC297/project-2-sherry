@@ -187,11 +187,12 @@ def review():
 
         return render_template("success.html", complete=complete)
 
-@app.route("/api/<int:isbn>")
+@app.route("/api/<isbn>")
 def apiInfo(isbn):
     # Check to see if ISBN exists in database
-    checkISBN = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"),
-        {"isbn": str(isbn)}).fetchone()
+    checkISBN = db.execute(text("SELECT isbn FROM books WHERE isbn = :isbn"),
+        {"isbn": isbn}).fetchone()
+    
     if checkISBN:
         info = retrieveBook(isbn)
         return render_template("api.html", info=info)
