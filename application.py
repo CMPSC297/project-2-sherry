@@ -10,15 +10,18 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
 app.secret_key = '_23hd9udhf*HUHDF'
+
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-# app.config['SECRET_KEY'] = 'hfouuwu9e8r9ui23jrojrlefl'
-# Session(app)
 
 # Set up database
 engine = create_engine("postgresql://localhost/sherryzhang")
 db = scoped_session(sessionmaker(bind=engine))
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route('/set_session')
 def set_session(id):
@@ -27,10 +30,6 @@ def set_session(id):
 @app.route("/get_session")
 def get_session():
     return session.get('id')
-
-@app.route("/")
-def index():
-    return render_template("index.html")
 
 # Register Button
 @app.route("/register", methods=["POST"])
@@ -67,14 +66,12 @@ def signin():
 def login():
     if request.method == "POST":
         username = request.form["username"]
-        # session['sessionUsername'] = username
         password = request.form["password"]
         
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
             {"username": username, "password": password}).fetchone()
         
         id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()[0]
-        print(id)
         set_session(id)
 
         if userInfo:
@@ -96,6 +93,8 @@ def search():
         isbn = request.form["isbn"]
         title= request.form["title"]
         author = request.form["author"]
+
+        # Users gave no input
         if isbn == "" and title == "" and author == "":
             return render_template("search.html", message="* Please enter an ISBN number, book title, or author.")
         
@@ -125,9 +124,10 @@ def search():
                 return render_template("search.html", books=books)
             else:
                 return render_template("search.html", message="No matches.")
-        
+            
+        # Users provided two inputs
         else:
-            return render_template("search.html", message="* Please only fill out one field above")
+            return render_template("search.html", message="* Please fill out one field above")
 
 # Return to Search
 @app.route("/returnToSearch", methods=["POST"])
@@ -148,51 +148,46 @@ def view():
             {"isbn": isbn}).fetchone()[0]
         reviews = db.execute(text("SELECT review FROM reviews WHERE isbn = :isbn"),
             {"isbn": isbn}).fetchall()
+        
+        # Reformatting book information
         averageRating = retrieveAverageRating(isbn)
         numberOfRating = retrieveNumberOfRating(isbn)
         titleDisplay = f"Title: {title}"
         authorDisplay = f"Author: {author}"
         yearDisplay = f"Year: {year}" 
+
         return render_template("book.html", isbn=isbn, title=titleDisplay, author=authorDisplay, year=yearDisplay, averageRating=averageRating, numberOfRating=numberOfRating, reviews=reviews)
 
 @app.route("/review", methods=["POST"])
 def review():
     if request.method == "POST":
         id = get_session()
-        # print(userid)
         isbn = request.form["isbn"]     
-        # print(isbn)  
         review = request.form["review"]
         rating = request.form["rating"]
 
         # Check if user already has existing review for the book
-        # print(rating)
-        # print(isbn)
-
         existingReviewCheck = db.execute(text("SELECT review FROM reviews WHERE id = :id AND isbn = :isbn"),
             {"id": id, "isbn": isbn}).fetchone()
         if existingReviewCheck:
             error = "Unable to submit review as you have already reviewed this book"
             return render_template("error.html", error=error)
-
+        
+        # Creating new review
         else:
-
-            # db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
-            # {"username": username, "password": password})   
-            # db.commit()
-
             db.execute(text("INSERT INTO reviews (id, isbn, rating, review) VALUES (:id, :isbn, :rating, :review)"),
             {"id": id, "isbn": isbn, "rating": rating, "review": review}) 
             db.commit()
             complete = "Your review has been submitted"
+
         return render_template("success.html", complete=complete)
 
-# @app.route("/api/flights/<int:flight_id>")
 @app.route("/api/<int:isbn>")
 def apiInfo(isbn):
-    check = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"),
+    # Check to see if ISBN exists in database
+    checkISBN = db.execute(text("SELECT * FROM books WHERE isbn = :isbn"),
         {"isbn": str(isbn)}).fetchone()
-    if check:
+    if checkISBN:
         info = retrieveBook(isbn)
         return render_template("api.html", info=info)
     else:

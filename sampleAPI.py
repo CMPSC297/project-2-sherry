@@ -33,7 +33,7 @@ def retrieveBook(isbn):
         "review_count": reviewCount,
         "average_score": rating
     }
-
+    
     return json.dumps(bookInfo)
 
 def retrieveAverageRating(isbn):
@@ -46,7 +46,7 @@ def retrieveAverageRating(isbn):
     bookData = res.json()
     volumeInfo = bookData["items"][0]["volumeInfo"]
 
-    # Checking if there are existing ratings
+    # Checking if an average rating exists
     try: 
         rating = volumeInfo["averageRating"]
     except KeyError:
@@ -67,7 +67,7 @@ def retrieveNumberOfRating(isbn):
     bookData = res.json()
     volumeInfo = bookData["items"][0]["volumeInfo"]
 
-    # Checking if there are existing ratings
+    # Checking if number of ratings exist
     try: 
         reviewCount = volumeInfo["ratingsCount"]
     except KeyError:

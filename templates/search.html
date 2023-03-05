@@ -7,11 +7,16 @@
 
 {% block body %}
 <div>
+    <!-- Login -->
     <form action="/logout" method="POST">
         <button class="logoutSignInButton">LOGOUT</button>
     </form>
+
     <h1>Search</h1>
+
     <p>To search for a book, please enter the book's ISBN number, title, or author.</p>
+
+    <!-- Book Search -->
     <form action="/search", method="POST">
         <label for="isbn" style="font-weight: bold;">ISBN:</label>
         <input type="text" id="isbn" name="isbn" class="isbn"><br><br>
@@ -24,10 +29,12 @@
 
         <input type="submit" id="search" class="search" value="Search">
     </form>
+
     {% if message %}
         <p class="message" style="color:red;">{{ message | safe }}</p>
     {% endif %}
 
+    <!-- Select Book Option -->
     <form action="/view" method="POST">
         <div class="form-group">
             <select class="form-control" name="book">
@@ -39,11 +46,7 @@
         <div class="form-group">
             <button class="submit">View Book</button>
         </div>
-        {% if results %}
-            <p class="message" style="color:red;">{{ results | safe}}</p>
-        {% endif %}
     </form>
-
 </div>
 
 {% endblock %}

@@ -20,6 +20,7 @@
     </p>
     <div>
         <h2>Registration</h2>
+        <!-- Register Account -->
         <form action="/register" method="POST">
             {% if message %}
             <p class="message" style="color:red">{{ message | safe }}</p>
@@ -33,6 +34,7 @@
 
             <input type="submit" value="Register" class="submit">
         </form>
+        <!-- Login -->
         <form action="/login" method="POST">
             <p>Have an account? <span><button class="logoutSignInButton">LOGIN</button></span></p>
         </form>

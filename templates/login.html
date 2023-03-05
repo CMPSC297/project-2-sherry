@@ -7,6 +7,7 @@
 
 {% block body %}
 <div>
+    <!-- Logout -->
     <form action="/logout" method="POST">
         <button class="logoutSignInButton">HOME</button>
     </form>
@@ -19,6 +20,7 @@
         {% if message %}
             <p class="message" style="color:red">{{ message | safe }}</p>
         {% endif %}
+        <!-- Login -->
         <form action="/signin" method="POST">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username"><br><br>

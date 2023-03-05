@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Book Detail</title>
+
+{% endblock %}
+
+{% block body %}
+
+<h1>Book Information From Google Books API</h1>
+<p>Result:</p>
+
+<!-- Successful API Result-->
+{% if info %}
+    <p class="info" style="color:rgb(226, 223, 223);">{{ info | safe }}</p>
+{% endif %}
+
+<!-- ISBN Error -->
+{% if error %}
+    <p class="error" style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
+{% endif %}
+
+{% endblock %}

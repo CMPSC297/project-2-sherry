@@ -3,7 +3,6 @@ body {
     color: rgb(226, 223, 223);
     margin: 75px;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-
 }
 
 h1 {
@@ -17,8 +16,10 @@ h1 {
     margin-bottom: 30px;
 }
 
-.submit {
+.submit, .returnToSearch, .search {
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    border: none;
+    border-radius: 8px;
     padding-left: 13px;
     padding-right: 13px;
     padding-top: 5px;
@@ -32,7 +33,9 @@ h1 {
     color: rgb(226, 223, 223);
     background: none;
     border: none;
+    border-radius: 10px;
     padding-left: 0px;
+    margin-bottom: 10px;
     cursor: pointer;
 }
 
@@ -57,31 +60,17 @@ h1 {
     margin-left: 21px;
 }
 
-.search {
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    padding-left: 15px;
-    padding-right: 15px;
-    margin-left: 15px;
-    margin-left: 0px;
-}
-
-/* Search Result Page */
-
 .form-control {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 10px;
 }
 
-/* Book Page*/
+/* Book Page */
 .review {
     width: 200px;
 }
-
 
 
