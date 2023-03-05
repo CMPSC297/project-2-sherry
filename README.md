@@ -2,8 +2,12 @@
 This simple web application allows users to search for books, view book details, and write reviews. Below is a breakdown of the tools used for the project as well as descriptions on each project file:
 
 **Programming Languages**: Python, SQL
+
 **Framework/Libraries**: Flask, SQLAlchemy
+
 **Database**: PostgreSQL
+
+Descriptions of each file:
 
 **application.py:** Main application file that contains the Flask routes and view functions.
 
