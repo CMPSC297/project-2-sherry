@@ -7,7 +7,7 @@ This simple web application allows users to search for books, view book details,
 
 **Database**: PostgreSQL
 
-Descriptions of each file:
+## Descriptions of each file:
 
 **application.py:** Main application file that contains the Flask routes and view functions.
 
@@ -36,4 +36,5 @@ Descriptions of each file:
 **main.css:** Contains the CSS for the application
 
 
-**Note:** For displaying the existing reviews for a book, I had issues with the formatting. I could not figure out how to remove the parentheses and the comma. 
+## Note
+For displaying the existing reviews for a book, I had issues with the formatting. I could not figure out how to remove the parentheses and the comma. 
