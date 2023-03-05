@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from sampleAPI import retrieveBook, retrieveAverageRating, retrieveNumberOfRating
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
