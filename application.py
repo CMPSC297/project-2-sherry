@@ -67,17 +67,22 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
+        # Username or password is missing
+        if username == "" or password == "":
+            render_template("login.html", message = "* Username and/or password is incorrect")
         
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
             {"username": username, "password": password}).fetchone()
         
-        id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()[0]
-        set_session(id)
+        if username != "" and password != "":
+            id = db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).fetchone()[0]
+            set_session(id)
 
         if userInfo:
             return render_template("search.html")
         
-    return render_template("login.html", message = "* Username and/or password is incorrect")
+        return render_template("login.html", message = "* Username and/or password is incorrect")
 
 # Logout
 @app.route("/logout", methods=["POST"])
